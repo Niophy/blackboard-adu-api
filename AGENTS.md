@@ -130,8 +130,26 @@ in.
 size and permanent URL. It reads the origin and course id off the page, so there is nothing to
 edit.
 
+**Check `complete` in the result before you use it.** If it is `false`, part of the course was
+not read, and the file list is short. `errors`, `warnings` and `unreadable` say what and where.
+Re-run rather than reporting a partial list as the course contents. If it is false twice in a
+row because of rate limiting, wait longer between attempts; do not work around it.
+
 **Step 3: compare against the folder.** List what is already in the destination folder and
-work out what is genuinely missing. Match on filename. Do not re-download what is there.
+work out what is genuinely missing.
+
+Compare on three things, not just the name:
+
+- **The manifest's `key`** (folder plus filename), because the same filename legitimately
+  appears in two different folders and a bare name cannot tell them apart.
+- **`bytes`**, because a file on disk whose size differs from the manifest is a different or
+  half-downloaded copy and should be fetched again.
+- **`modified`**, because an instructor re-uploading a corrected version under the same name is
+  normal. Same name and same size is a skip; same name and a newer date with a different size
+  is a re-download. If you cannot tell, ask rather than silently skipping.
+
+Filename alone will quietly miss a corrected file, which is the failure a student notices last
+and cares about most.
 
 **Step 4: show the student the manifest and wait.** Tell them what the course contains, what
 they already have, and what you propose to download. **Then stop and wait for confirmation.**
@@ -140,10 +158,19 @@ This is not a formality. Steps 1 to 3 are read-only and reversible; step 5 write
 disk. Keep a human decision between the two halves. Never skip straight to downloading because
 the answer seems obvious.
 
-**Step 5: download, verify, report.** Use snippet 2. For each file compare the received blob
-size against the declared `fileSize` and only count it as saved when they match. Stagger the
-saves; the browser silently blocks rapid repeated downloads from one origin. If a file will
-not land at all, use the presigned-link fallback in §6 of `BLACKBOARD-API.md`.
+**Step 5: download, verify, report.** Use snippet 2, and **paste the manifest from step 2 into
+its `MANIFEST` variable**. That is not a convenience: without it the snippet walks the entire
+course a second time, roughly doubling the number of requests and the time, for information you
+already have. Only leave `MANIFEST` null if you genuinely no longer have that result.
+
+The snippet compares each downloaded blob against the declared size and **refuses to save a
+file that does not match**, reporting it instead. Do not try to defeat that. A truncated file
+sitting on disk with the right name is worse than a missing one, because the student will not
+find out until they open it.
+
+Saves are staggered because the browser silently blocks rapid repeated downloads from one
+origin. If a file will not land at all, use the presigned-link fallback in §6 of
+`BLACKBOARD-API.md`.
 
 Report at the end: what was saved, what was skipped because it was already present, and
 anything that failed with the reason. If a size check failed, say so plainly and do not
@@ -178,6 +205,7 @@ chats.
 ## 8. Done looks like
 
 - A folder for this course, either created with the student's agreement or one they named.
+- A manifest that came back `complete: true`, not a partial walk reported as the whole course.
 - Every downloadable file in the course accounted for, including the ones the interface hides.
 - Missing files saved into the folder they named, each one size-verified.
 - Files already present left untouched.

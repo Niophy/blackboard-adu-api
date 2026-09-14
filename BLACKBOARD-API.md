@@ -231,6 +231,21 @@ Seen in the interface's own traffic, listed for orientation: `…/entitlements`,
 | 401 or a redirect to the ADU sign-in page | Session expired | Sign in yourself in the browser, then re-run. Never script the sign-in |
 | Only the first download lands | Chrome silently blocks repeated automatic downloads from one origin, and its "allow multiple downloads" prompt cannot be clicked by an extension | Stagger saves and verify each; else use the presigned fallback below |
 | Tab stuck on "Leave site?" | A file viewer page registers an unsaved-changes handler that even a forced navigation will not dismiss | Never open viewer pages. Open a fresh tab and leave the stuck one |
+| Manifest comes back `complete: false` | A folder failed twice, or returned a full page with no cursor, or hit the depth cap | Read `errors`, `warnings` and `unreadable`. Re-run. Never treat a short list as the course contents |
+| A download reports `size mismatch` and is not saved | The transfer was cut short, or the item changed mid-run | Re-run that one file. Do not save it anyway; a truncated file is worse than a missing one |
+
+### On trusting the manifest
+
+The walk reports failure rather than absorbing it. A folder it could not read after one retry
+is listed in `unreadable` and flips `complete` to `false`, because an unread folder and an
+empty folder are indistinguishable from the outside and only one of them is safe to ignore.
+This matters most under the rate limiting above: the statusless `TypeError` arrives per
+request, so an unguarded walk will happily return a short list and look like it worked.
+
+Pagination follows a cursor only when the response supplies one. No query parameter is
+invented for it, since an unsupported one 404s and would be indistinguishable from a missing
+folder. If a folder returns a full page with no cursor, that is flagged rather than assumed
+to be the end.
 
 ### Presigned-link fallback
 
@@ -361,6 +376,12 @@ can hand the same file to another ADU student and have it work for them.
 **What to expect.** One course, one pass, is roughly four tool calls: walk the tree, resolve
 the files, compare against the local folder, download the gaps. The clicking equivalent runs
 to about thirty and misses the collapsed and hidden items.
+
+**Feed the manifest into the download step.** Snippet 2 takes snippet 1's result in its
+`MANIFEST` variable, and given it, skips re-walking the course entirely. Without it the second
+snippet repeats the whole tree walk and every per-file lookup, which is most of the work: a
+course with N files goes from about N+1 requests to about 2N+2. It is the largest saving
+available in this workflow and it costs nothing to take.
 
 ---
 
