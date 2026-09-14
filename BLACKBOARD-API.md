@@ -123,7 +123,7 @@ The two are not interchangeable. Paths that exist on one may 404 on the other; s
 
 ## 5. Endpoints
 
-`<courseId>` below is the Blackboard course id, in the form `_91180_1`. It is visible in the
+`<courseId>` below is the Blackboard course id, in the form `_12345_1`. It is visible in the
 outline URL, so the script reads it from `location.pathname` rather than asking you for it.
 
 ### Identity and enrolment
