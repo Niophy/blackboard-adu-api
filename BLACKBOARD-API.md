@@ -276,10 +276,16 @@ whole reference in one step and have everything in §1 to §6 in context:
 https://github.com/Niophy/blackboard-adu-api
 ```
 
+Tell it to start with `AGENTS.md`, which is written for the assistant rather than for you: the
+intent behind the job, the rules it must not break, the traps below stated before it meets
+them, and what finishing properly looks like. It should read this document too, for the
+endpoint detail.
+
 If your assistant handles raw files more reliably than rendered pages, point it straight at
 the source instead:
 
 ```
+https://raw.githubusercontent.com/Niophy/blackboard-adu-api/main/AGENTS.md
 https://raw.githubusercontent.com/Niophy/blackboard-adu-api/main/BLACKBOARD-API.md
 https://raw.githubusercontent.com/Niophy/blackboard-adu-api/main/bb-sync.js
 ```
@@ -318,8 +324,8 @@ that gets you the `TypeError: Failed to fetch` with no status.
 **Briefing to copy and paste**, adjusting the folder:
 
 ```text
-First read https://github.com/Niophy/blackboard-adu-api and use BLACKBOARD-API.md there as
-your reference for everything below. Do not work it out from scratch; the traps are documented.
+First read https://github.com/Niophy/blackboard-adu-api, starting with AGENTS.md and then
+BLACKBOARD-API.md. Do not work this out from scratch; the traps are already documented there.
 
 I am signed in to ADU Blackboard (https://blackboard.adu.ac.ae) in the browser, on the outline
 page for <course>. This chat covers that course only. Its folder is <folder>.
@@ -383,6 +389,8 @@ and the Imperva edge would work with it at all.
 
 | Path | Role |
 |---|---|
+| `README.md` | Landing page. What this is and how to point an assistant at it. |
+| `AGENTS.md` | The brief for an AI assistant: intent, ground rules, procedure, traps, what done looks like. Hand this to the agent first. |
 | `BLACKBOARD-API.md` | This document. The source of truth for API behaviour. |
 | `bb-sync.js` | Working script: a manifest snippet and a download snippet, both paste-ready. |
 
