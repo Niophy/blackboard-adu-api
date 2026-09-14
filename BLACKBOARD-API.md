@@ -3,6 +3,11 @@
 Canonical working document for pulling course material out of ADU Blackboard.
 Anything else that describes this process defers to this file.
 
+Everything here is the product of research: reading the Blackboard Learn REST documentation,
+watching the requests the Ultra front end actually makes, and testing each endpoint against a
+live course until the behaviour was reproducible. Section 1 exists because the first reading of
+the evidence was wrong and the research corrected it.
+
 - **Host:** `https://blackboard.adu.ac.ae`
 - **Deployment:** Blackboard Learn Ultra, SaaS, behind Imperva. UI build observed `uiv4000.21.0-rel.61`
 - **Established:** 14 September 2026, against ITE 414 Introduction to E-Commerce
