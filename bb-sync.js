@@ -1,18 +1,20 @@
-/* Blackboard Learn Ultra course sync.
+/* ADU Blackboard Ultra course sync.
  *
  * Paste into the browser console, or into a tool that executes JavaScript inside the
- * signed-in tab. Works on any Learn Ultra deployment: the origin and the course id are
- * both read from the page, so there is nothing to edit before the first run.
+ * signed-in tab. Works for any ADU student and any course you are enrolled in: the
+ * origin and the course id are both read from the page, so there is nothing to edit
+ * before the first run and nothing goes stale between terms.
  *
- * Prerequisite: a tab open on  https://<your-host>/ultra/courses/<id>/outline
+ * Prerequisite: a tab open on
+ *     https://blackboard.adu.ac.ae/ultra/courses/<id>/outline
  * with you already signed in. This never enters credentials and never touches cookies.
  *
  * THE ONE GOTCHA: the Ultra page carries
- *     <base href="https://<hash>.cloudfront.net/ultra/uiv...">
- * so every relative URL, including root-relative "/learn/api/...", resolves to the CDN
- * and comes back as an S3 <Error><Code>NoSuchKey</Code>. That 404 is what earlier notes
- * misread as "CSP blocks fetch()". It is not CSP. Nothing is blocked. Always build
- * absolute URLs against ORIGIN below.
+ *     <base href="https://dmuwut6e40u5o.cloudfront.net/ultra/uiv...">
+ * so every relative URL, including root-relative "/learn/api/...", resolves to
+ * CloudFront and comes back as an S3 <Error><Code>NoSuchKey</Code>. That 404 is what
+ * earlier notes misread as "CSP blocks fetch()". It is not CSP. Nothing is blocked.
+ * Always build absolute URLs against ORIGIN below.
  *
  * API base is the INTERNAL /learn/api/v1, not /learn/api/public/v1 (public needs a
  * developer key students cannot get; internal rides the session cookie).
@@ -26,9 +28,9 @@
 // Read-only. Run this first and look at what comes back.
 // ---------------------------------------------------------------------------
 (async () => {
-  const ORIGIN = location.origin;                 // never hardcode a host
+  const ORIGIN = location.origin;                 // https://blackboard.adu.ac.ae
   const m = location.pathname.match(/courses\/([^/]+)/);
-  if (!m) return { error: 'Not on a course page. Open .../ultra/courses/<id>/outline first.' };
+  if (!m) return { error: 'Not on a course page. Open a Blackboard course outline first.' };
   const CID = m[1];
 
   const api = async (p) => {
