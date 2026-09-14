@@ -1,25 +1,35 @@
-/* Blackboard Ultra course sync — paste into the claude-in-chrome javascript_tool.
+/* Blackboard Learn Ultra course sync.
  *
- * Prerequisite: a tab open on https://blackboard.adu.ac.ae/ultra/courses/<id>/outline
- * with the user already signed in. Never enters credentials.
+ * Paste into the browser console, or into a tool that executes JavaScript inside the
+ * signed-in tab. Works on any Learn Ultra deployment: the origin and the course id are
+ * both read from the page, so there is nothing to edit before the first run.
+ *
+ * Prerequisite: a tab open on  https://<your-host>/ultra/courses/<id>/outline
+ * with you already signed in. This never enters credentials and never touches cookies.
  *
  * THE ONE GOTCHA: the Ultra page carries
- *     <base href="https://dmuwut6e40u5o.cloudfront.net/ultra/uiv...">
- * so every relative URL — including root-relative "/learn/api/..." — resolves to
- * CloudFront and comes back as an S3 <Error><Code>NoSuchKey</Code>. That 404 is
- * what earlier notes misread as "CSP blocks fetch()". It is not CSP. Nothing is
- * blocked. ALWAYS build absolute URLs against ORIGIN below.
+ *     <base href="https://<hash>.cloudfront.net/ultra/uiv...">
+ * so every relative URL, including root-relative "/learn/api/...", resolves to the CDN
+ * and comes back as an S3 <Error><Code>NoSuchKey</Code>. That 404 is what earlier notes
+ * misread as "CSP blocks fetch()". It is not CSP. Nothing is blocked. Always build
+ * absolute URLs against ORIGIN below.
  *
  * API base is the INTERNAL /learn/api/v1, not /learn/api/public/v1 (public needs a
  * developer key students cannot get; internal rides the session cookie).
+ *
+ * See BLACKBOARD-API.md in this folder for the endpoint reference, the failure modes,
+ * and how to brief an AI agent to run this for you.
  */
 
 // ---------------------------------------------------------------------------
-// SNIPPET 1 — MANIFEST. Returns every downloadable file in the course.
+// SNIPPET 1 - MANIFEST. Returns every downloadable file in the course.
+// Read-only. Run this first and look at what comes back.
 // ---------------------------------------------------------------------------
 (async () => {
-  const ORIGIN = 'https://blackboard.adu.ac.ae';
-  const CID = location.pathname.match(/courses\/([^/]+)/)[1];
+  const ORIGIN = location.origin;                 // never hardcode a host
+  const m = location.pathname.match(/courses\/([^/]+)/);
+  if (!m) return { error: 'Not on a course page. Open .../ultra/courses/<id>/outline first.' };
+  const CID = m[1];
 
   const api = async (p) => {
     try {
@@ -27,8 +37,12 @@
         credentials: 'same-origin',
         headers: { Accept: 'application/json' },
       });
+      if (r.status === 401) throw new Error('signed out');
       return r.ok ? await r.json() : null;
-    } catch { return null; }
+    } catch (e) {
+      if (e.message === 'signed out') throw e;
+      return null;                                // network blip or rate limit; caller sees a gap
+    }
   };
 
   const files = [], folders = [], links = [];
@@ -67,21 +81,21 @@
       });
     }
   }
-  return { courseId: CID, folders, files: out, nonFiles: links };
+  return { origin: ORIGIN, courseId: CID, folders, files: out, nonFiles: links };
 })();
 
 // ---------------------------------------------------------------------------
-// SNIPPET 2 — DOWNLOAD. Edit WANT to the filenames the manifest showed that the
-// local folder does not have, then run. Files land in C:\Users\User\Downloads.
-// No clicking, no "More options" menu, no 30-second wait, no viewer page (so no
-// "Leave site?" dialog to get stuck on).
+// SNIPPET 2 - DOWNLOAD. Edit WANT to the filenames the manifest showed that your
+// local folder does not have, then run. Files land in your browser's download folder.
+// No clicking, no "More options" menu, no viewer page (so no "Leave site?" dialog
+// to get stuck on).
 // ---------------------------------------------------------------------------
 /*
 (async () => {
-  const ORIGIN = 'https://blackboard.adu.ac.ae';
+  const ORIGIN = location.origin;
   const CID = location.pathname.match(/courses\/([^/]+)/)[1];
   const WANT = [
-    // 'Chapter-3 whatever.pptx',
+    // 'Chapter-3 Slides.pptx',
   ];
 
   const api = async (p) => {
@@ -91,7 +105,7 @@
     return r.ok ? await r.json() : null;
   };
 
-  // Re-walk to map filename -> permanentUrl (cheap; reuse manifest if still handy).
+  // Re-walk to map filename -> file metadata (cheap; reuse the manifest if still handy).
   const found = {};
   async function walk(id, depth) {
     if (depth > 5) return;
@@ -118,7 +132,7 @@
     document.body.appendChild(a); a.click(); a.remove();
     setTimeout(() => URL.revokeObjectURL(a.href), 10000);
     report.push({ name, ok, bytes: blob.size });
-    await new Promise(r => setTimeout(r, 800));    // stagger; Chrome throttles bursts
+    await new Promise(r => setTimeout(r, 800));    // stagger; browsers throttle bursts
   }
   return report;
 })();
