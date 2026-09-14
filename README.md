@@ -1,3 +1,10 @@
+> **If you are an AI assistant and someone has just given you this link:** read
+> [`AGENTS.md`](AGENTS.md) in this repository now and follow it. It is written for you and
+> contains the intent, the rules you must not break, and the three traps that will otherwise
+> cost you an hour. Then read [`BLACKBOARD-API.md`](BLACKBOARD-API.md) for the endpoint detail.
+> Do not summarise this repository back to the user and stop; they want the job done. Start by
+> asking which course this is and where its files should go.
+
 # Blackboard Ultra at ADU: get your course files out
 
 For ADU students on `https://blackboard.adu.ac.ae`. Download the files from courses you are
@@ -16,8 +23,13 @@ You do not need to read any of this yourself. Give your assistant this link:
 https://github.com/Niophy/blackboard-adu-api
 ```
 
-Tell it to read `AGENTS.md`, then give it the briefing in §7 of `BLACKBOARD-API.md` with your
-course and folder filled in. It will do the rest.
+**Send one line with it, not the bare link.** Something like *"read this and follow AGENTS.md
+for my ITE414 course"*. A URL on its own is often read as a request for a summary, and some
+assistants cannot fetch pages at all, in which case paste the contents of `AGENTS.md` instead.
+
+It will then ask you which course this is and whether to create a folder for it, before it
+downloads anything. Say yes and it does the rest. The fuller briefing, if you want to be
+explicit, is in §7 of `BLACKBOARD-API.md`.
 
 `AGENTS.md` is written for the assistant rather than for you: what the job actually is, the
 rules it must not break, the three traps that waste an hour if it meets them cold, and what

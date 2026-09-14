@@ -328,7 +328,10 @@ First read https://github.com/Niophy/blackboard-adu-api, starting with AGENTS.md
 BLACKBOARD-API.md. Do not work this out from scratch; the traps are already documented there.
 
 I am signed in to ADU Blackboard (https://blackboard.adu.ac.ae) in the browser, on the outline
-page for <course>. This chat covers that course only. Its folder is <folder>.
+page for <course>. This chat covers that course only.
+
+Before anything else, ask me whether to create a folder for this course and propose a name.
+If I have already named one, use it. Do not download into an unspecified location.
 
 Your job: list every downloadable file in this course, compare against what is already in the
 folder, and save only what is missing.

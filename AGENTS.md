@@ -60,10 +60,32 @@ sentence. The method depends on staying ordinary.
    here: it has no ADU session.
 2. **The tab open on the course outline**, at
    `https://blackboard.adu.ac.ae/ultra/courses/<courseId>/outline`.
-3. **A destination folder, named by the student.** One folder per course is the intended
-   setup. If they have not said which folder, ask before downloading anything.
+3. **A destination folder for this course.** One folder per course is the intended setup.
+   Do not assume one, and do not default to the downloads folder.
 
 If any of the three is missing, ask for it rather than improvising around it.
+
+### Ask about the folder before anything else
+
+Unless the student has already named a folder, **ask them whether you should create one for
+this course**, and propose a name based on the course code, for example `ITE414`. Offer to put
+it alongside their other course folders if you can see where those live.
+
+Ask it plainly, early, and only once. Something like:
+
+> This looks like ITE414. Do you want me to create a folder for it, say
+> `<parent>\ITE414`, and save the course files there? Or point me at a folder you already use.
+
+Wait for their answer before creating anything. If they say yes, create the folder, confirm
+the full path back to them, and use it for the rest of this conversation and every later run
+for this course. If they name an existing folder instead, use that and do not create anything.
+If they decline a folder entirely, ask where they do want the files; do not start downloading
+into an unspecified location.
+
+Why this is worth a question rather than a guess: the whole setup depends on one folder per
+course. It is what turns each later run into a simple comparison between the course tree and
+that folder, which is how you know what is missing without asking them to remember. A pile of
+files in a shared downloads folder loses that, and they will be the one sorting it out.
 
 ## 4. The three traps, stated before you hit them
 
@@ -94,6 +116,10 @@ it. That is what it looks like you should do, it does not work, and it makes the
 like exactly what it is not.
 
 ## 5. The procedure
+
+**Step 0: settle the folder.** If the student has not already named one, ask whether to create
+a folder for this course as described in §3, and wait for the answer. Do this before the
+manifest, so that when you report what is missing you can say where it will go.
 
 **Step 1: confirm the session.** Run the `/learn/api/v1/users/me` check from §2 of
 `BLACKBOARD-API.md`. JSON with an `id` means you are good. A redirect means ask them to sign
@@ -151,6 +177,7 @@ chats.
 
 ## 8. Done looks like
 
+- A folder for this course, either created with the student's agreement or one they named.
 - Every downloadable file in the course accounted for, including the ones the interface hides.
 - Missing files saved into the folder they named, each one size-verified.
 - Files already present left untouched.
