@@ -266,12 +266,66 @@ the right tools.
 2. This document, or at least §1, §3 and §5, in its context.
 3. Permission from you to save files to a folder you name.
 
+### The fastest way to hand it over: send the link
+
+You do not need to download this file and attach it. This repository is public, so paste the
+link and tell the agent to read it. Any assistant that can fetch a web page will pull the
+whole reference in one step and have everything in §1 to §6 in context:
+
+```
+https://github.com/Niophy/blackboard-adu-api
+```
+
+If your assistant handles raw files more reliably than rendered pages, point it straight at
+the source instead:
+
+```
+https://raw.githubusercontent.com/Niophy/blackboard-adu-api/main/BLACKBOARD-API.md
+https://raw.githubusercontent.com/Niophy/blackboard-adu-api/main/bb-sync.js
+```
+
+Then the briefing below is all you write yourself. The agent reads the reference, knows about
+the `<base href>` trap before it trips over it, and does the rest of the work.
+
+This is also how you pass the method to another ADU student: send them the link, not a copy.
+They get the current version, including anything fixed after you read it.
+
+### One folder and one chat per course
+
+The setup that makes this painless, and the one these notes were written alongside:
+
+**A folder per course, named by course code.** `ITE401`, `ITE408`, `ITE414`, and so on, all
+under one parent folder. Make them before you start. The whole sync is then a comparison
+between one course tree and one folder, so the agent can tell you exactly which files are
+missing and drop them in the right place without you sorting anything afterwards.
+
+**A chat per course.** Start a separate conversation for each course and tell it two things
+at the outset: which course it covers and which folder is its destination. Keep them going
+across the term rather than starting fresh each time. Each chat then knows what it downloaded
+last time and what the folder already holds, so a mid-term catch-up is one short message
+instead of a re-explanation.
+
+**This document is the shared reference underneath all of them.** Course chats defer to it on
+anything about the API: endpoints, `contentHandler` values, failure modes. They hold the
+per-course detail: the course id, the folder path, what has already been pulled. Keeping that
+split means a correction to the API behaviour is made once, here, rather than in five chats
+that will slowly disagree with each other.
+
+Downloading one course at a time is not just tidier, it is also the behaviour that stays
+inside the rate limits in §6. A run that walks five courses back to back is exactly the burst
+that gets you the `TypeError: Failed to fetch` with no status.
+
 **Briefing to copy and paste**, adjusting the folder:
 
 ```text
-I am signed in to ADU Blackboard (https://blackboard.adu.ac.ae) in the browser, on a course
-outline page. Use the attached BLACKBOARD-API.md as the reference. Your job is to list every
-downloadable file in this course and save the ones I do not already have into <folder>.
+First read https://github.com/Niophy/blackboard-adu-api and use BLACKBOARD-API.md there as
+your reference for everything below. Do not work it out from scratch; the traps are documented.
+
+I am signed in to ADU Blackboard (https://blackboard.adu.ac.ae) in the browser, on the outline
+page for <course>. This chat covers that course only. Its folder is <folder>.
+
+Your job: list every downloadable file in this course, compare against what is already in the
+folder, and save only what is missing.
 
 Hard rules:
 - Build every URL absolutely from location.origin. Relative URLs hit the CloudFront base and
@@ -344,8 +398,10 @@ captured user id and the term's course id table are gone, replaced by the member
 in §5 that finds your own; the script now reads the origin and course id from the page
 instead of carrying them. Added §2 as a pre-flight check, §7 on briefing an AI agent,
 explicit ground rules on using your own account and never handling credentials or cookies,
-and a 401 row in the failure table. Still ADU-specific by design: the host, the Imperva edge
-and the sign-on are ours, and §8 explains why no existing tool covers us.
+and a 401 row in the failure table. §7 also covers the two things that make this painless in
+practice: hand the agent this repository's link rather than a copy of the file, and keep one
+folder and one chat per course. Still ADU-specific by design: the host, the Imperva edge and
+the sign-on are ours, and §8 explains why no existing tool covers us.
 
 **2026-09-14, first version.** Replaced the UI-clicking method. Corrected the CSP
 misdiagnosis to the `<base href>` resolution bug. Documented the content tree, file
